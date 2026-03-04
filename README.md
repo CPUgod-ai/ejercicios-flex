@@ -206,6 +206,3 @@ En este taller se logró:
 Este ejercicio permitió reforzar la comprensión del funcionamiento interno de Lex y el manejo de memoria dinámica en C dentro de un analizador léxico.
 
 ---
-
-Fin del taller.
-0
