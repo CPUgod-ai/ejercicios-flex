@@ -1,0 +1,66 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define NHASH 9997
+
+struct symbol {
+    char *name;
+    int count;
+    struct symbol *next;
+};
+
+struct symbol *symtab[NHASH];
+
+unsigned symhash(char *sym) {
+    unsigned int hash = 0;
+    unsigned c;
+
+    while ((c = *sym++))
+        hash = hash * 9 ^ tolower(c);
+
+    return hash % NHASH;
+}
+
+struct symbol *lookup(char *sym) {
+    struct symbol *sp;
+    unsigned int hash = symhash(sym);
+
+    for (sp = symtab[hash]; sp != NULL; sp = sp->next)
+        if (strcasecmp(sp->name, sym) == 0) {
+            sp->count++;
+            return sp;
+        }
+
+    sp = malloc(sizeof(struct symbol));
+    sp->name = strdup(sym);
+    sp->count = 1;
+    sp->next = symtab[hash];
+    symtab[hash] = sp;
+
+    return sp;
+}
+
+void print_table() {
+    int i;
+    struct symbol *sp;
+
+    for (i = 0; i < NHASH; i++)
+        for (sp = symtab[i]; sp != NULL; sp = sp->next)
+            printf("%s: %d\n", sp->name, sp->count);
+}
+%}
+
+%%
+[a-zA-Z]+   { lookup(yytext); }
+.           ;
+%%
+
+int main() {
+    yylex();
+    print_table();
+    return 0;
+}
+
